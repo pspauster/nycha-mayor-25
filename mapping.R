@@ -32,15 +32,15 @@ leaflet() %>%
               label = ~paste("Layer3 Info:", DEVELOPMEN))
 
 #intersect developments and Eds
-intersections_25 <- st_intersection(nycha_development_sf, eds_25) %>% 
-  mutate(intersection_area = st_area(.),
-         per_ed_covered = intersection_area/ed_area)
-
-intersections_25_flat <- intersections_25 %>%
-  as.data.frame() %>% 
-  group_by(ElectDist) %>% 
-  summarize(intersection_area_sum = sum(intersection_area),
-            per_ed_covered = intersection_area_sum/ed_area)
+# intersections_25 <- st_intersection(nycha_development_sf, eds_25) # %>% 
+#   mutate(intersection_area = st_area(.),
+#          per_ed_covered = intersection_area/ed_area)
+# 
+# intersections_25_flat <- intersections_25 %>%
+#   as.data.frame() %>% 
+#   group_by(ElectDist) %>% 
+#   summarize(intersection_area_sum = sum(intersection_area),
+#             per_ed_covered = intersection_area_sum/ed_area)
 
 #get coverage score by ED for filtering
 big_nycha_25 <- nycha_development_sf %>% 
@@ -50,19 +50,27 @@ big_nycha_25 <- nycha_development_sf %>%
          per_ed_covered = intersection_area/ed_area)
 
 eds_list_25 <- big_nycha_25 %>% 
-  filter(as.numeric(per_ed_covered) > 0.5) %>% 
+  filter(as.numeric(per_ed_covered) > 0.35) %>% 
   pull(ElectDist)
 
-# repeat for 21
-intersections_21 <- st_intersection(nycha_development_sf, eds_21) %>% 
-  mutate(intersection_area = st_area(.),
-         per_ed_covered = intersection_area/ed_area)
+intersections_25 <- st_intersection(nycha_development_sf, eds_25) %>% 
+  mutate(in_list = ElectDist %in% eds_list_25)
 
-intersections_21_flat <- intersections_21 %>% 
-  as.data.frame() %>% 
-  group_by(ElectDist) %>% 
-  summarize(intersection_area = sum(intersection_area),
-            per_ed_covered = intersection_area/ed_area)
+eds_25_flagged <- eds_25 %>% 
+  mutate(in_list = ElectDist %in% eds_list_25)
+
+saveRDS(eds_list_25, "public_housing_eds_25.rds")
+
+# repeat for 21
+# intersections_21 <- st_intersection(nycha_development_sf, eds_21) %>% 
+#   mutate(intersection_area = st_area(.),
+#          per_ed_covered = intersection_area/ed_area)
+# 
+# intersections_21_flat <- intersections_21 %>% 
+#   as.data.frame() %>% 
+#   group_by(ElectDist) %>% 
+#   summarize(intersection_area = sum(intersection_area),
+#             per_ed_covered = intersection_area/ed_area)
 
 big_nycha_21 <- nycha_development_sf %>% 
   summarize(geometry = st_union(geometry)) %>% 
@@ -71,25 +79,41 @@ big_nycha_21 <- nycha_development_sf %>%
          per_ed_covered = intersection_area/ed_area)
 
 eds_list_21 <- big_nycha_21 %>% 
-  filter(as.numeric(per_ed_covered) > 0.5) %>% 
+  filter(as.numeric(per_ed_covered) > 0.35) %>% 
   pull(ElectDist)
 
+intersections_21 <- st_intersection(nycha_development_sf, eds_21) %>% 
+  mutate(in_list = ElectDist %in% eds_list_21)
+
+eds_21_flagged <- eds_21 %>% 
+  mutate(in_list = ElectDist %in% eds_list_21)
+
+saveRDS(eds_list_21, "public_housing_eds_21.rds")
 
 # map based on individual property map
-pal <- colorNumeric(palette = "YlOrRd", domain = as.numeric(intersections_25$per_ed_covered))
+pal <- colorFactor(palette = c("gray", "red"), domain =c(TRUE, FALSE))
+pal2 <- colorFactor(palette = c("gray", "blue"), domain =c(TRUE, FALSE))
 
 leaflet() %>% 
   addProviderTiles("CartoDB.Positron") %>%
 
-  addPolygons(data = eds_25,
-              color = "blue", weight = 2,
-              fillOpacity = 0,
-              label = ~paste("Layer2 Info:", ElectDist)) %>% 
-  addPolygons(data = intersections_25,
+  addPolygons(data = eds_25_flagged,
+              fillColor = ~pal(in_list), weight = 2,
+              color='gray',
+              fillOpacity = .7,
+              label = ~paste("Layer1 Info:", ElectDist)) %>% 
+  addPolygons(data = eds_21_flagged,
+              fillColor = ~pal2(in_list), weight = 2,
+              color = "gray",
+              fillOpacity = .7,
+              label = ~paste("Layer1 Info:", ElectDist)) %>% 
+  addPolygons(data = nycha_development_sf,
               color = "black", weight = 2,
-              fillOpacity = 0.8,
-              fillColor = ~pal(as.numeric(per_ed_covered)),
-              label = ~paste("Layer2 Info:", ElectDist, per_ed_covered)) 
+              fillOpacity = 0,
+              #fillColor = ~pal(as.numeric(per_ed_covered)),
+              label = ~paste("Layer2 Info:", DEVELOPMEN)) 
+
+
 
 
 
