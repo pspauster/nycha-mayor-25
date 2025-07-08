@@ -50,11 +50,18 @@ big_nycha_25 <- nycha_development_sf %>%
          per_ed_covered = intersection_area/ed_area)
 
 eds_list_25 <- big_nycha_25 %>% 
-  filter(as.numeric(per_ed_covered) > 0.35) %>% 
+  filter(as.numeric(per_ed_covered) > 0.25) %>% 
   pull(ElectDist)
 
 intersections_25 <- st_intersection(nycha_development_sf, eds_25) %>% 
   mutate(in_list = ElectDist %in% eds_list_25)
+
+intersections_25_xwalk <- intersections_25 %>% 
+  as.data.frame() %>% 
+  select(DEVELOPMEN, ElectDist) %>% 
+  distinct()
+
+saveRDS(intersections_25_xwalk, "xwalk_25.rds")
 
 eds_25_flagged <- eds_25 %>% 
   mutate(in_list = ElectDist %in% eds_list_25)
@@ -79,11 +86,18 @@ big_nycha_21 <- nycha_development_sf %>%
          per_ed_covered = intersection_area/ed_area)
 
 eds_list_21 <- big_nycha_21 %>% 
-  filter(as.numeric(per_ed_covered) > 0.35) %>% 
+  filter(as.numeric(per_ed_covered) > 0.25) %>% 
   pull(ElectDist)
 
 intersections_21 <- st_intersection(nycha_development_sf, eds_21) %>% 
   mutate(in_list = ElectDist %in% eds_list_21)
+
+intersections_21_xwalk <- intersections_21 %>% 
+  as.data.frame() %>% 
+  select(DEVELOPMEN, ElectDist) %>% 
+  distinct()
+
+saveRDS(intersections_21_xwalk, "xwalk_21.rds")
 
 eds_21_flagged <- eds_21 %>% 
   mutate(in_list = ElectDist %in% eds_list_21)
