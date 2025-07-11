@@ -33,10 +33,29 @@ votes_ed_21 %>%
             total = sum(as.integer(total1), na.rm = T))%>% 
   mutate(adams_share = adams/total)
 
+xwalk_25 <- readRDS("xwalk_25.rds")
+xwalk_21 <- readRDS("xwalk_21.rds")
 
 development_25 <- votes_ed_25 %>%
   filter(public_housing == TRUE) %>% 
+  left_join(xwalk_25, by = "districtid") %>% 
+  ungroup() %>% 
   group_by(DEVELOPMEN) %>% 
+  summarize(cuomo = sum(cuomo25, na.rm = T),
+            mamdani = sum(zohran25, na.rm = T),
+            total = sum(total25, na.rm = T)) %>% 
+  mutate(cuomo_share = cuomo/total,
+         mamdani_share = mamdani/total)
   
+development_21 <- votes_ed_21 %>%
+  filter(public_housing == TRUE) %>% 
+  left_join(xwalk_25, by = "districtid") %>% 
+  ungroup() %>% 
+  group_by(DEVELOPMEN) %>% 
+  summarize(adams = sum(as.integer(adams1), na.rm = T),
+            total = sum(as.integer(total1), na.rm = T))%>% 
+  mutate(adams_share = adams/total)
 
-
+joined <- full_join(development_21, development_25, by = "DEVELOPMEN") %>% 
+  mutate(adams_cuomo_swing = adams_share - cuomo_share)
+  

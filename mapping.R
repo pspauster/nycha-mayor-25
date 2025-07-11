@@ -58,7 +58,8 @@ intersections_25 <- st_intersection(nycha_development_sf, eds_25) %>%
 
 intersections_25_xwalk <- intersections_25 %>% 
   as.data.frame() %>% 
-  select(DEVELOPMEN, ElectDist) %>% 
+  mutate(districtid = as.character(ElectDist)) %>% 
+  select(DEVELOPMEN, districtid) %>% 
   distinct()
 
 saveRDS(intersections_25_xwalk, "xwalk_25.rds")
@@ -94,7 +95,8 @@ intersections_21 <- st_intersection(nycha_development_sf, eds_21) %>%
 
 intersections_21_xwalk <- intersections_21 %>% 
   as.data.frame() %>% 
-  select(DEVELOPMEN, ElectDist) %>% 
+  mutate(districtid = as.character(ElectDist)) %>% 
+  select(DEVELOPMEN, districtid) %>% 
   distinct()
 
 saveRDS(intersections_21_xwalk, "xwalk_21.rds")
