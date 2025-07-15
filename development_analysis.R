@@ -2,6 +2,9 @@ library(tidyverse)
 library(jsonlite)
 library(googlesheets4)
 
+eds_list_21 <- readRDS("public_housing_eds_21.rds")
+eds_list_25 <- readRDS("public_housing_eds_25.rds")
+
 votes_ed_25 <- read_csv("ed_mayor_2025.csv") %>% 
   group_by(ED_num, AD_num) %>% 
   summarize(zohran25 = sum(votes[candidate == "Zohran Kwame Mamdani"], na.rm=T),

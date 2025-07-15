@@ -1,6 +1,7 @@
 library(sf)
 library(tidyverse)
 library(leaflet)
+library(geojsonio)
 
 nycha_development_sf <- read_sf("nycha_pact_developments_shapefile.geojson") %>% 
   mutate(dev_area = st_area(.)) %>% 
@@ -14,6 +15,10 @@ eds_21 <- read_sf("2021_eds_planning_clipped/nyed_21b") %>%
 eds_25 <- read_sf("2025_eds_planning/nyed_25b") %>% 
   st_transform(crs = st_crs(nycha_development_sf)) %>% 
   mutate(ed_area = st_area(.))
+
+eds_25 %>% st_simplify(0.001) %>% st_write(dsn = "2025_simplified.geojson", append = FALSE, delete_dsn = TRUE)
+
+ed_result_25 <- read_csv("2025_results.csv")
 
 #map all layers
 leaflet() %>%
@@ -30,6 +35,22 @@ leaflet() %>%
               color = "pink", weight = 2,
               fillOpacity = 0.2,
               label = ~paste("Layer3 Info:", DEVELOPMEN))
+
+
+map_25_results <- full_join(eds_25, ed_result_25, by = c("ElectDist" = "districtid")) %>% 
+  rowwise() %>% 
+  mutate(
+    winner = c("zohran25", "cuomo25", "lander25")[which.max(c_across(zohran25:lander25))],
+    # 2a. Keep the winning value handy
+    win_value = case_when(
+      winner == "val1" ~ zohran25,
+      winner == "val2" ~ cuomo25,
+      TRUE             ~ lander25
+    )
+  ) %>% 
+  ungroup()
+
+
 
 #intersect developments and Eds
 # intersections_25 <- st_intersection(nycha_development_sf, eds_25) # %>% 
