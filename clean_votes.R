@@ -1,6 +1,7 @@
 library(tidyverse)
 library(jsonlite)
 library(googlesheets4)
+library(sf)
 
 
 eds_list_21 <- readRDS("public_housing_eds_21.rds")
@@ -57,6 +58,19 @@ votes_ed_25 <- read_csv("ed_mayor_2025.csv") %>%
 write_csv(votes_ed_25, "2025_results.csv")
 
 write_csv(votes_ed_25 %>% filter(selected_devs==T), "2025_selected_results.csv")
+
+nycha_development_sf <- read_sf("nycha_pact_developments_shapefile.geojson") %>% 
+
+    mutate(dev_area = st_area(.)) %>% 
+  st_make_valid()
+
+eds_25 <- read_sf("2025_eds_planning/nyed_25b") %>% 
+  st_transform(crs = st_crs(nycha_development_sf)) %>% 
+  mutate(districtid = as.character(ElectDist))
+
+geo_results <- left_join(eds_25, votes_ed_25, by = "districtid")
+
+write_sf(geo_results, "geo_25_results.geojson", append = F, delete_layer = T)
 
 votes_ed_21 <- fromJSON("2021_eds.json") %>% select(districtid, adams1, total1) %>% 
   mutate(public_housing = districtid %in% eds_list_21)

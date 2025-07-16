@@ -18,7 +18,7 @@ votes_ed_25 <- read_csv("ed_mayor_2025.csv") %>%
 raw21 <- fromJSON("2021_eds.json")
 
 votes_ed_21 <- raw21 %>% 
-  select(districtid, adams1, garcia1, wiley1, total1, adams8, total8) %>% 
+  select(districtid, adams1, garcia1, wiley1, total1, adams8, garcia8, total8) %>% 
   mutate(public_housing = districtid %in% eds_list_21,
          Year = 2021)
 
@@ -48,16 +48,22 @@ dev_sum_21 <- development_merged_21 %>%
             wiley = sum(as.integer(wiley1), na.rm = T),
             total = sum(as.integer(total1), na.rm = T),
             total8 = sum(as.integer(total8), na.rm = T),
-            adams8 = sum(as.integer(adams8), na.rm = T))%>% 
+            adams8 = sum(as.integer(adams8), na.rm = T),
+            garcia8 = sum(as.integer(garcia8), na.rm = T),
+            )%>% 
   mutate(adams_share = adams/total,
          garcia_wiley_share = (garcia + wiley)/total,
-         adams_final_share = adams8/total8)
+         adams_final_share = adams8/total8,
+         garcia_final_share = garcia8/total8,
+         )
 
 devs_compare <- left_join(dev_sum_21, dev_sum_25, by = "Development") %>% 
   mutate(mod_difference = adams_share - cuomo_share,
          prog_difference = garcia_wiley_share - mamdani_share,
          final_to_first = adams_final_share - cuomo_share,
-         vote_diff = total.x-total.y)
+         vote_diff = total.x-total.y,
+         final_21 = adams_final_share - garcia_final_share,
+         prog_final = mamdani_share - garcia_final_share)
 
 write_csv(devs_compare, "output-devs.csv")
 

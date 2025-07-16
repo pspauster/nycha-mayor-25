@@ -1,0 +1,487 @@
+<html>
+
+<head>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.css' rel='stylesheet' />
+    <script src="https://cdn.jsdelivr.net/npm/mapbox-gl-globe-minimap@1.2.0/dist/bundle.js"></script>
+    <style>
+        @font-face {
+            font-family: "Opinion Pro Bold";
+            src: url("fonts/Opinion Pro Bold.ttf");
+        }
+
+        @font-face {
+            font-family: "Neue Haas Grotesk Text Pro";
+            src: url("fonts/38184073029.ttf");
+            src: url("fonts/31862445252.ttf");
+        }
+
+        html::-webkit-scrollbar {
+            width: 0;
+            background-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Neue Haas Grotesk Text Pro";
+        }
+
+        .container-map {
+            position: relative;
+            height: 100%;
+            width: 100%;
+            margin: auto;
+            background-color: white;
+        }
+
+        .sidebar {
+            position: absolute;
+            width: 250px;
+            z-index: 10;
+            background: #444;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 15px;
+            margin-left: 15px;
+            font-family: "Neue Haas Grotesk Text Pro";
+            color: white
+        }
+
+        .title-interactive {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            font-family: "Opinion Pro Bold";
+        }
+
+        .description-interactive p {
+            font-size: 10px;
+            margin-bottom: 10px;
+            line-height: normal;
+            padding: 5px;
+        }
+
+        #legend {
+            padding: 5px;
+            /* line-height: 14px; */
+            font-size: 14px;
+        }
+
+        #map2 {
+            /* height: 80vh; */
+            /* width: 80vw; */
+            height: 100%;
+            width: 100%;
+            position: absolute
+                /* position: relative; */
+                /* margin: auto; */
+                /* background-color: white; */
+                /*padding-left: 10vw;
+            padding-right: 10vw;*/
+        }
+
+        .legend-box {
+            border: none;
+            border-radius: 5px;
+        }
+
+        .mapboxgl-popup-content {
+            background-color: #fafafa;
+        }
+
+
+        .mapboxgl-popup-close-button {
+            color: #444
+        }
+
+        .popup-container {
+            font-family: "Neue Haas Grotesk Text Pro";
+            background-color: #444;
+            color: #fafafa
+        }
+
+        .popup-table {
+            width: 100%;
+            /* Adjust width as needed */
+            table-layout: fixed;
+            color: white;
+            font-size: 12px;
+            /* Ensures the set column widths take effect */
+        }
+
+        .popup-table td:first-child {
+            width: 67%;
+            /* Column 1 (1/3 of the table width) */
+        }
+
+        .popup-table td:last-child {
+            width: 33%;
+            /* Column 2 (2/3 of the table width) */
+        }
+
+        .popup-title {
+            font-family: "Opinion Pro Bold";
+            font-size: 20px
+        }
+
+        .faint {
+            font-size: 8px;
+            font-style: italic;
+            text-align: right;
+        }
+
+        .popup-header {
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .popup-arrow {
+            display: inline-block;
+            margin-right: 5px;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .popup-section {
+            font-size: 12px;
+            font-weight: 300;
+            line-height: 14px
+        }
+
+        .popup-status {
+            text-align: right;
+        }
+
+        .popup-container td .popup-status {
+            color: #0071bc
+        }
+
+        .p {
+            margin: 0px;
+        }
+
+        tr span {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        .legend-item {
+            font-size: 12px;
+            color: white;
+            padding-right: 5px;
+        }
+
+        .legend-swatch {
+            width: 40px;
+            height: 20px;
+            border-radius: 0%;
+            display: inline-block;
+            margin-right: 0px;
+            font-size: 10;
+            text-align: center;
+            color: white;
+            border-top: 10px;
+        }
+
+        .col2 {
+            padding-left: 10px;
+        }
+
+        .description-interactive p {
+            margin-bottom: 0px;
+        }
+
+
+        @media (max-width: 750px) {
+
+            .mapboxgl-popup-content {
+                background-color: #444;
+                width: 200px
+            }
+
+            .container-map {
+                display: flex;
+                flex-direction: column-reverse;
+            }
+
+            .sidebar {
+                position: relative;
+                height: 32%;
+                width: 100%;
+                margin: 0;
+                overflow-y: scroll;
+                flex-grow: 0;
+                box-sizing: border-box;
+            }
+
+
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container-map">
+        <div class="sidebar">
+            <div class="title-interactive">
+                2025 Primary Results and NYCHA Campuses
+            </div>
+            <div class="description-interactive">
+                <p> First-round vote share by election precinct.
+                </p>
+            </div>
+            <div class="legend-box">
+                <div id="legend">
+                    <table class="candidate-legend">
+                        <tbody>
+                            <tr>
+                                <td class=legend-item><strong>Mamdani</strong></td>
+                                <td class=legend-swatch style="background-color: #b2fcb2;"></td>
+                                <td class=legend-swatch style="background-color: #66e066;"></td>
+                                <td class=legend-swatch style="background-color: #33cc33;"></td>
+                                <td class=legend-swatch style="background-color: #009900;"></td>
+                            </tr>
+                            <tr>
+                                <td class=legend-item><strong>Cuomo</strong></td>
+                                <td class=legend-swatch style="background-color: #b2d8ff;"></td>
+                                <td class=legend-swatch style="background-color: #66b2ff;"></td>
+                                <td class=legend-swatch style="background-color: #3399ff;"></td>
+                                <td class=legend-swatch style="background-color: #0066cc;"></td>
+                            </tr>
+                            <tr>
+                                <td class=legend-item><strong>Lander</strong></td>
+                                <td class=legend-swatch style="background-color: #f9c2ff;"></td>
+                                <td class=legend-swatch style="background-color: #e066ff;"></td>
+                                <td class=legend-swatch style="background-color: #cc33ff;"></td>
+                                <td class=legend-swatch style="background-color: #9900cc;"></td>
+                            </tr>
+                            <tr>
+                                <td class=legend-item style="text-align: right;"><strong>%</strong></td>
+                                <td class='legend-swatch'>0-40</td>
+                                <td class=legend-swatch>40-60</td>
+                                <td class=legend-swatch>60-80</td>
+                                <td class=legend-swatch>80 +</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="map2"></div>
+    </div>
+</body>
+
+<script>
+    mapboxgl.accessToken = "pk.eyJ1IjoiY2l0eWxpbWl0cyIsImEiOiJjbTg0bjN5ejMxZmZvMmpvcmgyM3VraDZjIn0._m4vmvlZqC5FYJ73cPFO_g";
+
+    var map2 = new mapboxgl.Map({
+        container: 'map2',
+        style: 'mapbox://styles/mapbox/light-v11',
+        center: [-73.9974, 40.7020],
+        zoom: 10,
+        bearing: 0,
+        pitch: 0,
+        interactive: true,
+        projection: 'equirectangular'
+    });
+
+
+    map2.on("load", function () {
+        map2.addSource('precincts', {
+            type: 'geojson',
+            data: 'geo_25_results.geojson',
+            generateID: true
+        })
+        map2.addLayer({
+            'id': 'precincts-fill',
+            'type': 'fill',
+            'source': 'precincts',
+            'paint': {
+                'fill-color': [
+                    'match',
+                    ['get', 'category'],
+                    // Mammadi – greens
+                    'Mamdani 0‑40%', '#b2fcb2',
+                    'Mamdani 40‑60%', '#66e066',
+                    'Mamdani 60‑80%', '#33cc33',
+                    'Mamdani 80%+', '#009900',
+
+                    // Cuomo – blues
+                    'Cuomo 0‑40%', '#b2d8ff',
+                    'Cuomo 40‑60%', '#66b2ff',
+                    'Cuomo 60‑80%', '#3399ff',
+                    'Cuomo 80%+', '#0066cc',
+
+                    // Lander – purples
+                    'Lander 0‑40%', '#f9c2ff',
+                    'Lander 40‑60%', '#e066ff',
+                    'Lander 60‑80%', '#cc33ff',
+                    'Lander 80%+', '#9900cc',
+
+                    '#808080'        // default gray
+                ],
+                'fill-opacity': 0.5
+            },
+        });
+
+        map2.addLayer({
+            id: 'precincts-outline',
+            type: 'line',
+            source: 'precincts',
+            paint: {
+                'line-width': 1,
+                'line-color': [
+                    'case',
+                    ['boolean', ['feature-state', 'hover'], false], 'white',
+                    // match same as fill color
+                    ['match',
+                        ['get', 'category'],
+                        'Mamdani 0‑40%', '#b2fcb2',
+                        'Mamdani 40‑60%', '#66e066',
+                        'Mamdani 60‑80%', '#33cc33',
+                        'Mamdani 80%+', '#009900',
+                        'Cuomo 0‑40%', '#b2d8ff',
+                        'Cuomo 40‑60%', '#66b2ff',
+                        'Cuomo 60‑80%', '#3399ff',
+                        'Cuomo 80%+', '#0066cc',
+                        'Lander 0‑40%', '#f9c2ff',
+                        'Lander 40‑60%', '#e066ff',
+                        'Lander 60‑80%', '#cc33ff',
+                        'Lander 80%+', '#9900cc',
+                        '#808080'
+                    ]
+                ]
+            }
+        });
+
+        map2.addSource('nycha', {
+            type: 'geojson',
+            data: 'nycha_pact_developments_shapefile.geojson'
+        })
+        map2.addLayer({
+            'id': 'nycha',
+            'type': 'line',
+            'source': 'nycha',
+            paint: {
+                'line-color': [
+                    'case',
+                    ['boolean', ['feature-state', 'hover'], false],
+                    'white',
+                    'red'
+                ],
+                'line-width': 1.5  // control stroke thickness here
+            }
+        });
+
+    }
+    )
+
+    map2.on('click', 'precincts-fill', (e) => {
+        const feature = e.features[0];
+        const properties = feature.properties;
+
+        // Extract properties, defaulting to 'N/A' if missing
+        const Category = properties.category || 'No data';
+        const Mamdani = properties.zohran25 || '';
+        const Cuomo = properties.cuomo25 || '';
+        const Lander = properties.lander25 || '';
+        const Total = properties.total25 || 'No data';
+        const ED_num = (properties.ED_num?.match(/ (\S+)$/) || [])[1] || '';
+        const AD_num = (properties.AD_num?.match(/ (\S+)$/) || [])[1] || '';
+
+
+        // Candidate values
+        const candidateData = [
+            { name: 'Mamdani', value: parseFloat(Mamdani) || 0 },
+            { name: 'Cuomo', value: parseFloat(Cuomo) || 0 },
+            { name: 'Lander', value: parseFloat(Lander) || 0 }
+        ];
+
+        // Sort descending
+        candidateData.sort((a, b) => b.value - a.value);
+
+        // Create popup content with table and collapsible sections
+        let popupContent = `
+            <div style="font-family: sans-serif;">
+                <strong>Assembly District ${AD_num}, Election District ${ED_num}</strong><br>
+                ${candidateData.map(c => `${c.name}: ${c.value} votes`).join('<br>')}
+            </div>
+            `;
+        // Create and show the popup
+        new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML(popupContent)
+            .addTo(map2);
+    });
+
+    let hoveredId = null;
+
+    // Change cursor when hovering over the layer
+    map2.on('mouseenter', 'precincts-fill', () => {
+        map2.getCanvas().style.cursor = 'pointer';
+    });
+    map2.on('mouseleave', 'precincts-fill', () => {
+        map2.getCanvas().style.cursor = '';
+    });
+
+    map2.on('mousemove', 'precincts-fill', (e) => {
+        map2.getCanvas().style.cursor = 'pointer';
+        const feature = e.features[0];
+
+        if (hoveredId !== null && hoveredId !== feature.id) {
+            map2.setFeatureState({ source: 'precincts', id: hoveredId }, { hover: false });
+        }
+
+        hoveredId = feature.id;
+        map2.setFeatureState({ source: 'precincts', id: hoveredId }, { hover: true });
+    });
+
+    map2.on('mouseleave', 'precincts-fill', () => {
+        map2.getCanvas().style.cursor = '';
+        if (hoveredId !== null) {
+            map2.setFeatureState({ source: 'precincts', id: hoveredId }, { hover: false });
+        }
+        hoveredId = null;
+    });
+
+    const nycha_popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+    })
+
+    map2.on('mouseenter', 'nycha', (e) => {
+        const feature = e.features[0];
+        const properties = feature.properties;
+
+        // Extract properties, defaulting to 'N/A' if missing
+        const projectName = properties.DEVELOPMEN || '';
+        const units = properties.TOTAL_UNIT || '';
+
+        // Create popup content with table and collapsible sections
+        const popupContent = `
+            <p>${projectName}</p>
+             `;
+
+        // Create and show the popup
+        nycha_popup
+            .setLngLat(e.lngLat)
+            .setHTML(popupContent)
+            .addTo(map2);
+    });
+
+    // Change cursor when hovering over the layer
+    map2.on('mouseenter', 'nycha', () => {
+        map2.getCanvas().style.cursor = 'pointer';
+    });
+    map2.on('mouseleave', 'nycha', () => {
+        map2.getCanvas().style.cursor = '';
+        if (nycha_popup) {
+            nycha_popup.remove();
+            nycha_popup = null;
+        }
+
+    });
+
+</script>
+
+</html>
