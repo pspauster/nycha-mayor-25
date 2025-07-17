@@ -49,14 +49,14 @@
         }
 
         .title-interactive {
-            font-size: 28px;
+            font-size: 25px;
             font-weight: 800;
-            margin-bottom: 8px;
+            margin-bottom: 0px;
             font-family: "Opinion Pro Bold";
         }
 
         .description-interactive p {
-            font-size: 10px;
+            font-size: 15px;
             margin-bottom: 10px;
             line-height: normal;
             padding: 5px;
@@ -192,11 +192,10 @@
         }
 
 
-        @media (max-width: 750px) {
+        @media (max-width: 400px) {
 
             .mapboxgl-popup-content {
-                background-color: #444;
-                width: 200px
+                background-color: #fafafa;
             }
 
             .container-map {
@@ -206,10 +205,10 @@
 
             .sidebar {
                 position: relative;
-                height: 32%;
+                height: 30%;
                 width: 100%;
                 margin: 0;
-                overflow-y: scroll;
+                overflow-y: visible;
                 flex-grow: 0;
                 box-sizing: border-box;
             }
