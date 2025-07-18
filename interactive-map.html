@@ -208,9 +208,16 @@
                 height: 30%;
                 width: 100%;
                 margin: 0;
-                overflow-y: visible;
+                overflow-y: scroll;
                 flex-grow: 0;
                 box-sizing: border-box;
+            }
+
+            .legend-swatch {
+                width: 20px;
+                height: 10px;
+                font-size: 8px;
+                border-top: 5px;
             }
 
 
@@ -225,7 +232,7 @@
             <div class="title-interactive">
                 2025 Primary Results and NYCHA Campuses
             </div>
-            <div class= 'description-interactive' style="display: flex; align-items: center; gap: 6px;">
+            <div class='description-interactive' style="display: flex; align-items: center; gap: 6px;">
                 <div style="width: 16px; height: 16px; border: 2px solid red; background-color: transparent;">
                 </div>
                 <p>All NYCHA developments (PACT included)</p>
@@ -286,8 +293,12 @@
         bearing: 0,
         pitch: 0,
         interactive: true,
-        projection: 'equirectangular'
+        projection: 'equirectangular',
+        scrollZoom: false,
+        touchZoomRotate: false,
     });
+
+    map2.addControl(new mapboxgl.NavigationControl());
 
 
     map2.on("load", function () {
