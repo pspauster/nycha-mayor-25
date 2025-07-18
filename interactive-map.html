@@ -39,17 +39,19 @@
             position: absolute;
             width: 250px;
             z-index: 10;
-            background: #444;
+            background: #fafafa;
             padding: 12px;
             border-radius: 10px;
             margin-top: 15px;
             margin-left: 15px;
             font-family: "Neue Haas Grotesk Text Pro";
-            color: white
+            color: #444;
+            border-width: 1px;
+            border-color: #444;
         }
 
         .title-interactive {
-            font-size: 25px;
+            font-size: 20px;
             font-weight: 800;
             margin-bottom: 0px;
             font-family: "Opinion Pro Bold";
@@ -82,7 +84,8 @@
         }
 
         .legend-box {
-            border: none;
+            border-width: 1px;
+            border-color: #444;
             border-radius: 5px;
         }
 
@@ -106,7 +109,7 @@
             /* Adjust width as needed */
             table-layout: fixed;
             color: white;
-            font-size: 12px;
+            font-size: 10px;
             /* Ensures the set column widths take effect */
         }
 
@@ -122,7 +125,7 @@
 
         .popup-title {
             font-family: "Opinion Pro Bold";
-            font-size: 20px
+            font-size: 15px
         }
 
         .faint {
@@ -143,7 +146,7 @@
         }
 
         .popup-section {
-            font-size: 12px;
+            font-size: 10px;
             font-weight: 300;
             line-height: 14px
         }
@@ -167,7 +170,7 @@
 
         .legend-item {
             font-size: 12px;
-            color: white;
+            color: #444;
             padding-right: 5px;
         }
 
@@ -179,7 +182,7 @@
             margin-right: 0px;
             font-size: 10;
             text-align: center;
-            color: white;
+            color: #444;
             border-top: 10px;
         }
 
@@ -201,6 +204,10 @@
             .container-map {
                 display: flex;
                 flex-direction: column-reverse;
+            }
+
+            .title-interactive {
+                font-size: 18px;
             }
 
             .sidebar {
@@ -417,7 +424,7 @@
 
         // Create popup content with table and collapsible sections
         let popupContent = `
-            <div style="font-family: sans-serif;">
+            <div>
                 <strong>Assembly District ${AD_num}, Election District ${ED_num}</strong><br>
                 ${candidateData.map(c => `${c.name}: ${c.value} votes`).join('<br>')}
             </div>
