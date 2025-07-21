@@ -67,5 +67,23 @@ devs_compare <- left_join(dev_sum_21, dev_sum_25, by = "Development") %>%
 
 write_csv(devs_compare, "output-devs.csv")
 
+devs_compare %>% 
+  ungroup() %>% 
+  summarize(adams = sum(as.integer(adams), na.rm = T),
+            garcia_wiley = sum(as.integer(garcia), na.rm = T)+sum(wiley),
+            mamdani = sum(mamdani),
+            cuomo = sum(cuomo),
+            adams8 = sum(adams8),
+            garcia8 = sum(garcia8),
+            total_8 = sum(total8),
+            total_21 = sum(total.x),
+            total_25 = sum(total.y)) %>% 
+  mutate(adams_share = adams/total_21,
+         garcia_wiley_share = garcia_wiley/total_21,
+         mamdani_share = mamdani/total_25,
+         cuomo_share = cuomo/total_25,
+         garcia_final = garcia8/(garcia8+adams8),
+         adams_final = adams8/(garcia8+adams8),
+         )
 
 
